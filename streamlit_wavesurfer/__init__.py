@@ -49,7 +49,9 @@ def wavesurfer(audio_src: str, regions: List[Region], key: Optional[str]=None) -
     from streamlit import _main
     from streamlit.elements.media import marshall_audio, AudioProto
     import urllib.parse
-    if _RELEASE:
+    if _RELEASE and not audio_src.startswith("http"):
+        if not os.path.exists(audio_src):
+            raise ValueError(f"Provided audio file {audio_src} does not exist!")
         session = st.runtime.get_instance()._session_mgr.list_active_sessions()[0]
         st_base_url = urllib.parse.urlunparse(
             [session.client.request.protocol, session.client.request.host, "", "", "", ""])
@@ -78,7 +80,8 @@ if not _RELEASE:
 
     st.set_page_config(layout="wide")
     v = st.slider(label="offset", min_value=0, max_value=10)
-    st.audio("/Users/piter/PycharmProjects/streamlit_wavesurfer/streamlit_wavesurfer/frontend/public/SoundHelix-Song-2.mp3")
-    num_clicks = wavesurfer("/Users/piter/PycharmProjects/streamlit_wavesurfer/streamlit_wavesurfer/frontend/public/SoundHelix-Song-2.mp3" , [Region(start=1.0+v, end=5.0+v, content="hello")], key="11")
+    # st.audio("/Users/piter/PycharmProjects/streamlit_wavesurfer/streamlit_wavesurfer/frontend/public/SoundHelix-Song-2.mp3")
+    abc = st.checkbox("track")
+    num_clicks = wavesurfer(("frontend/public/" if _RELEASE else "") + ("SoundHelix-Song-2.mp3" if not abc else "abc.mp3"), [Region(start=1.0+v, end=5.0+v, content="hello")], key="11")
 
 

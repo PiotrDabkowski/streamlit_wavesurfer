@@ -24,7 +24,6 @@ const randomColor = () => `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0
 export class WavesurferViewer extends React.Component {
     constructor(props) {
         super(props);
-        this.audioSrc = props.audioSrc;
         this.onReady = props.onReady;
         this.activeRegion = null
 
@@ -38,6 +37,7 @@ export class WavesurferViewer extends React.Component {
             zoomMinPxPerS: 100,
             isPlaying: false,
             loopRegion: false,
+            audioSrc: props.audioSrc,
         }
         this.waveform = null;
         console.log("in init??")
@@ -54,12 +54,12 @@ export class WavesurferViewer extends React.Component {
     componentWillReceiveProps(nextProps) {
         console.log("Updated props:", nextProps.regions)
         if (JSON.stringify(nextProps.regions) !== JSON.stringify(this.state.regions)) {
-            console.log("Detected diff!")
             this.setState({regions: nextProps.regions})
             this.updateRegions(nextProps.regions)
-
-        } else {
-            console.log("no diff")
+        }
+        if (nextProps.audioSrc !== this.state.audioSrc) {
+            this.setState({audioSrc: nextProps.audioSrc, isPlaying: false})
+            this.waveform.load(nextProps.audioSrc)
         }
     }
 
@@ -102,7 +102,7 @@ export class WavesurferViewer extends React.Component {
         })
 
 
-        console.log("LOADING", this.waveform.load(this.audioSrc))
+        console.log("LOADING", this.waveform.load(this.state.audioSrc))
 
 
         this.onReady()
@@ -141,26 +141,6 @@ export class WavesurferViewer extends React.Component {
             this.activeRegion = null
 
           })
-
-
-
-        // Mute entirely, the audio actually plays elsewhere.
-        // this.waveformSlider.setMute(true);
-        // this.waveformSlider.on("seek", (frac) => {
-        //     console.log("Seeek!")
-        //     this.seek(frac, false)
-        //     // Make sure the state is in sync...
-        //     if (this.state.playing !== this.waveformSlider.isPlaying()) {
-        //         console.log("Warning waveform slider state not in sync with the player, syncing to playing:", this.state.playing)
-        //         if (this.state.playing) {
-        //             this.waveformSlider.play()
-        //         } else {
-        //             this.waveformSlider.pause()
-        //         }
-        //
-        //     }
-        // })
-        // this.setState({trigger: Math.random()})
     }
 
     render() {
@@ -170,7 +150,7 @@ export class WavesurferViewer extends React.Component {
             <div ref={this.waveformRef} style={{width: "100%"}}/>
             <center style={{width: "50%"}}>
                 Zoom
-              <Slider min={1} max={100} aria-label="Zoom"  value={this.state.zoomMinPxPerS} onChange={(e, value) => {this.setState({zoomMinPxPerS: value});this.waveform.zoom(value)}}/>
+              <Slider min={1} max={200} aria-label="Zoom"  value={this.state.zoomMinPxPerS} onChange={(e, value) => {this.setState({zoomMinPxPerS: value});this.waveform.zoom(value)}}/>
             </center>
 
             <IconButton onClick={() => {
