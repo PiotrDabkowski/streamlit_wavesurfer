@@ -1,0 +1,40 @@
+{
+  "name": "streamlit_component_template",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/jest": "^29.5.10",
+    "@types/node": "^20.10.3",
+    "@types/react": "^17.0.71",
+    "@types/react-dom": "^17.0.25",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "^5.0.1",
+    "streamlit-component-lib": "^2.0.0",
+    "typescript": "^3.2.1",
+    "wavesurfer.js": "^7.4.13"
+  },
+  "scripts": {
+    "start": "react-scripts --openssl-legacy-provider  start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      "last 1 chrome version"
+    ],
+    "development": [
+      "last 1 chrome version"
+    ]
+  },
+  "homepage": "."
+}
