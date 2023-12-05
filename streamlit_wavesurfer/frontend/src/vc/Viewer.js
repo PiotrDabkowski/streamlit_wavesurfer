@@ -5,6 +5,7 @@ import {Slider} from "@material-ui/core"
 import PlayCircleFilled from "@material-ui/icons/PlayCircleFilled";
 import PauseCircleFilled from "@material-ui/icons/PauseCircleFilled";
 import IconButton from "@material-ui/core/IconButton";
+import Checkbox from "@material-ui/core/Checkbox";
 
 export class Region {
     constructor(start, end, content, color, drag, resize) {
@@ -38,6 +39,7 @@ export class WavesurferViewer extends React.Component {
             isPlaying: false,
             loopRegion: false,
             audioSrc: props.audioSrc,
+            autoCenter: true
         }
         this.waveform = null;
         console.log("in init??")
@@ -45,6 +47,18 @@ export class WavesurferViewer extends React.Component {
         this.waveformRef = React.createRef();
         this.wsRegions = null;
 
+    }
+
+    getWsOptions(autoCenter) {
+        return {
+            container: this.waveformRef.current,
+            waveColor: 'violet',
+            progressColor: 'purple',
+            responsive: true,
+            xhr: { cache: 'default', mode: 'no-cors'},
+            autoCenter: autoCenter,
+            autoScroll: autoCenter,
+        }
     }
 
     componentDidMount() {
@@ -83,23 +97,17 @@ export class WavesurferViewer extends React.Component {
         console.log("Regions just after update", this.wsRegions.getRegions())
     }
 
+    setAutoCenter(on) {
+        this.waveform.setOptions(this.getWsOptions(on))
+    }
+
     initWaveform() {
         if (this.waveform) {
             return
         }
-        let xhr = { cache: 'default', mode: 'no-cors'};
-        this.waveform = WaveSurfer.create({
-            container: this.waveformRef.current,
-            waveColor: 'violet',
-            progressColor: 'purple',
-            responsive: true,
-            xhr: xhr,
-        });
-        this.wsRegions = this.waveform.registerPlugin(RegionsPlugin.create())
 
-        this.waveform.on('decode', () => {
-            this.updateRegions(this.state.regions)
-        })
+        this.waveform = WaveSurfer.create(this.getWsOptions(this.state.autoCenter));
+        this.wsRegions = this.waveform.registerPlugin(RegionsPlugin.create())
 
 
         console.log("LOADING", this.waveform.load(this.state.audioSrc))
@@ -115,13 +123,16 @@ export class WavesurferViewer extends React.Component {
         this.waveform.on(
             "ready", () => {
                 this.waveform.zoom(this.state.zoomMinPxPerS)
+                setTimeout(() => {this.updateRegions(this.state.regions)}, 500)
             }
         )
 
-          this.wsRegions.on('region-in', (region) => {
-            this.activeRegion = region
-          })
+          // this.wsRegions.on('region-in', (region) => {
+          //     console.log("region inn!!!")
+          //   this.activeRegion = region
+          // })
           this.wsRegions.on('region-out', (region) => {
+              console.log("region out!!!")
             if (this.activeRegion === region) {
               if (this.state.loopRegion) {
                 region.play()
@@ -141,6 +152,7 @@ export class WavesurferViewer extends React.Component {
             this.activeRegion = null
 
           })
+        // this.setAutoCenter(false)
     }
 
     render() {
@@ -150,7 +162,7 @@ export class WavesurferViewer extends React.Component {
             <div ref={this.waveformRef} style={{width: "100%"}}/>
             <center style={{width: "50%"}}>
                 Zoom
-              <Slider min={1} max={200} aria-label="Zoom"  value={this.state.zoomMinPxPerS} onChange={(e, value) => {this.setState({zoomMinPxPerS: value});this.waveform.zoom(value)}}/>
+              <Slider min={1} max={300} aria-label="Zoom"  value={this.state.zoomMinPxPerS} onChange={(e, value) => {this.setState({zoomMinPxPerS: value});this.waveform.zoom(value)}}/>
             </center>
 
             <IconButton onClick={() => {
@@ -163,6 +175,8 @@ export class WavesurferViewer extends React.Component {
                         }
                     }}> {!this.state.isPlaying ? <PlayCircleFilled className="player-button"/> :
                         <PauseCircleFilled className="player-button"/>} </IconButton>
+            Auto-Center?
+            <Checkbox checked={this.state.autoCenter} onChange={(e, v) => {console.log(v);this.setState({autoCenter: v});this.setAutoCenter(v)}} />
 
             </div>
     }

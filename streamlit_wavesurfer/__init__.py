@@ -1,5 +1,7 @@
 __all__ = ["wavesurfer", "Region"]
 import os
+import random
+
 import streamlit.components.v1 as components
 from dataclasses import dataclass, asdict
 from typing import List, Optional
@@ -47,6 +49,7 @@ def wavesurfer(audio_src: str, regions: List[Region], key: Optional[str]=None) -
      False when not yet initialized (something is loading), and True when ready.
     """
     from streamlit import _main
+    import streamlit as st
     from streamlit.elements.media import marshall_audio, AudioProto
     import urllib.parse
     if _RELEASE and not audio_src.startswith("http"):
@@ -82,6 +85,9 @@ if not _RELEASE:
     v = st.slider(label="offset", min_value=0, max_value=10)
     # st.audio("/Users/piter/PycharmProjects/streamlit_wavesurfer/streamlit_wavesurfer/frontend/public/SoundHelix-Song-2.mp3")
     abc = st.checkbox("track")
-    num_clicks = wavesurfer(("frontend/public/" if _RELEASE else "") + ("SoundHelix-Song-2.mp3" if not abc else "abc.mp3"), [Region(start=1.0+v, end=5.0+v, content="hello")], key="11")
+    regions = []
+    for e in range(30):
+        regions.append(Region(start=1.0 + v+e, end=2.0 + v+e, content=f"hello{e}"*random.randrange(1, 4)))
+    num_clicks = wavesurfer(("streamlit_wavesurfer/frontend/public/" if _RELEASE else "") + ("SoundHelix-Song-2.mp3" if not abc else "abc.mp3"), regions, key="11")
 
 
