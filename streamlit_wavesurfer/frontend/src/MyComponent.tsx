@@ -4,7 +4,7 @@ import {
     withStreamlitConnection,
 } from "streamlit-component-lib"
 import React, {ReactNode, useEffect} from "react"
-import {WavesurferViewer, Region} from "./vc/Viewer.js"
+import {WavesurferViewer, Region, Graph} from "./vc/Viewer.js"
 import "./vc/Styles.css"
 
 interface State {
@@ -30,10 +30,11 @@ class MyComponent extends StreamlitComponentBase<State> {
 
     public render = (): ReactNode => {
         const regions = this.props.args["regions"].map((e: any) => new Region(e.start, e.end, e.content, e.color, e.drag, e.resize));
+        const graphs = this.props.args["graphs"] ? this.props.args["graphs"].map((e: any) => new Graph(e.name, e.points, e.color)) : null;
         const audioSrc = this.props.args["audio_src"];
 
         const demo = <WavesurferViewer audioSrc={audioSrc}
-                             regions={regions}
+                             regions={regions} graphs={graphs}
                              onReady={() => {
                                  if (!this.state.ready) {
                                      console.log("Ready!!!!")

@@ -4,7 +4,7 @@ import random
 
 import streamlit.components.v1 as components
 from dataclasses import dataclass, asdict
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 # When False => run: npm start
 # When True => run: npm run build
@@ -19,6 +19,12 @@ class Region:
     color: Optional[str] = None
     drag: bool = False
     resize: bool=False
+
+@dataclass
+class Graph:
+    name: str
+    points: List[Dict[str, float]]  # {x: float, y: float}
+    color: str = "blue"
 
 if not _RELEASE:
     _component_func = components.declare_component(
@@ -38,7 +44,7 @@ else:
 
 
 
-def wavesurfer(audio_src: str, regions: List[Region], key: Optional[str]=None) -> bool:
+def wavesurfer(audio_src: str, regions: List[Region], key: Optional[str]=None, graphs: Optional[List[Graph]]=None) -> bool:
     """Nice audio/video player with audio track selection support.
 
     User can select one of many provided audio tracks (one for each actor) and switch between them in real time.
@@ -70,6 +76,7 @@ def wavesurfer(audio_src: str, regions: List[Region], key: Optional[str]=None) -
     component_value = _component_func(
         audio_src=audio_url,
         regions=[asdict(region) for region in regions],
+        graphs=[asdict(graph) for graph in graphs],
         key=key,
         default=0
     )
@@ -80,6 +87,7 @@ def wavesurfer(audio_src: str, regions: List[Region], key: Optional[str]=None) -
 # For development, displays stub audio_selector.
 if not _RELEASE:
     import streamlit as st
+    import random
 
     st.set_page_config(layout="wide")
     v = st.slider(label="offset", min_value=0, max_value=10)
@@ -88,6 +96,10 @@ if not _RELEASE:
     regions = []
     for e in range(30):
         regions.append(Region(start=1.0 + v+e, end=2.0 + v+e, content=f"hello{e}"*random.randrange(1, 4)))
-    num_clicks = wavesurfer(("streamlit_wavesurfer/frontend/public/" if _RELEASE else "") + ("SoundHelix-Song-2.mp3" if not abc else "abc.mp3"), regions, key="11")
+
+    num_clicks = wavesurfer(("streamlit_wavesurfer/frontend/public/" if _RELEASE else "") + ("SoundHelix-Song-2.mp3" if not abc else "abc.mp3"), regions, key="11",
+                            graphs=[Graph(name="a", points=[dict(x=e, y=random.random()) for e in range(100)], color="red"), Graph(name="a", points=[dict(x=e, y=random.random()) for e in range(100)], color="green")],
+
+                            )
 
 
